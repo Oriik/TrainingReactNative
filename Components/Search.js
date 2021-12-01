@@ -14,7 +14,11 @@ constructor(props){
     this.searchedText =""
     this.currentPage = 0
     this.totalPages = 0
-}
+    }
+
+    _displayDetailForFilm = (idFilm) => {
+        this.props.navigation.navigate("FilmDetail", { idFilm: idFilm })
+    }
 
     _searchFilms(){
         this.currentPage = 0
@@ -66,7 +70,7 @@ constructor(props){
             <Button title="Rechercher" onPress={() => this._searchFilms()}/>
             <FlatList
                 data={this.state.films}
-                renderItem= {({item}) => <FilmItem film={item}/>}
+                renderItem= {({item}) => <FilmItem film={item} displayDetailForFilm={this._displayDetailForFilm}/>}
                 keyExtractor={(item)=>item.id.toString()}   
                 onEndReachedThreshold={0.5}
                 onEndReached={()=>{
