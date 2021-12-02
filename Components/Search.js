@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { StyleSheet, View, TextInput, Button, FlatList, ActivityIndicator } from 'react-native'
 import FilmItem from './FilmItem'
 import {getFilmsFromApiWithSearchedText} from '../API/TMDBApi'
+import { connect } from 'react-redux'
 
 class Search extends Component{
 
@@ -44,7 +45,7 @@ constructor(props){
                 isLoading: false            
             })
         })
-    }
+    }    
 
     _searchTextInputChanged(text){
         this.searchedText = text
@@ -54,7 +55,7 @@ constructor(props){
         if (this.state.isLoading) {
           return (
             <View style={styles.loading_container}>
-              <ActivityIndicator size='large' />
+              <ActivityIndicator size='large' color="#0000ff" />
             </View>
           )
         }
@@ -70,14 +71,20 @@ constructor(props){
             <Button title="Rechercher" onPress={() => this._searchFilms()}/>
             <FlatList
                 data={this.state.films}
-                renderItem= {({item}) => <FilmItem film={item} displayDetailForFilm={this._displayDetailForFilm}/>}
+                extraData={this.props.favoritesFilm}
+                renderItem= {({item}) => 
+                    <FilmItem 
+                        film={item} 
+                        displayDetailForFilm={this._displayDetailForFilm}
+                        isFavorite={(this.props.favoritesFilm.findIndex(film => film.id === item.id) !== -1) ? true : false}
+                        />}
                 keyExtractor={(item)=>item.id.toString()}   
                 onEndReachedThreshold={0.5}
                 onEndReached={()=>{
                     if (this.currentPage < this.totalPages) {
                         this._loadFilms()
                     }
-                }}        
+                }}
             />
             {this._displayLoading()}
         </View>  
@@ -109,4 +116,10 @@ const styles = StyleSheet.create({
     }      
 })
 
-export default Search
+const mapStateToProps = (state) => {
+    return {
+      favoritesFilm: state.favoritesFilm
+    }
+  }
+  
+  export default connect(mapStateToProps)(Search)
