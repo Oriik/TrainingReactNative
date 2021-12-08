@@ -10,18 +10,27 @@ class FilmDetail extends React.Component
     super(props)
     this.state = {
       film: undefined,
-      isLoading: true
+      isLoading: false
     }
   }
 
-  componentDidMount() 
-  {
-    getFilmDetailFromApi(this.props.route.params.idFilm).then(data => {
+  componentDidMount() {
+    const favoriteFilmIndex = this.props.favoritesFilm.findIndex(item => item.id === this.props.route.params.idFilm)
+    //The film is already in our favorite, no need to call the API, props already contain this film details
+    if (favoriteFilmIndex !== -1) {
+      this.setState({
+        film: this.props.favoritesFilm[favoriteFilmIndex]
+      })
+    }
+    else{ // The film isn't in our props, so we make an API call   
+      this.setState({ isLoading: true })
+      getFilmDetailFromApi(this.props.route.params.idFilm).then(data => {
         this.setState({
           film: data,
           isLoading: false
         })
       })
+  }
   }
 
   render() 
